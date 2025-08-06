@@ -157,10 +157,14 @@ jobs:
       - name: Wait for SonarQube Analysis to Complete
         run: |
           echo 'Waiting for SonarQube analysis...' && \
+          MAX_RETRIES=60 && \
+          COUNT=0 && \
           while true; do \
             STATUS=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: "${{ secrets.SONAR_HOST_URL }}/api/ce/component?component=${{ secrets.SONAR_PROJECT_KEY }}" | jq -r '.current.status'); \
-            echo "Current SonarQube status: $STATUS"; \
+            echo "Attempt $COUNT - SonarQube status: $STATUS"; \
             if [ "$STATUS" = "SUCCESS" ] || [ "$STATUS" = "FAILED" ]; then break; fi; \
+            COUNT=$((COUNT + 1)); \
+            if [ "$COUNT" -ge "$MAX_RETRIES" ]; then echo "Max retries reached ($MAX_RETRIES). Exiting loop."; break; fi; \
             sleep 5; \
           done
         continue-on-error: true
