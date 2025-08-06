@@ -39,7 +39,7 @@ jobs:
 
       - name: Start App
         run: |
-          PORT=8080 cd utils/website && yarn start &
+          PORT=3000 cd utils/website && yarn start &
 
       - name: Wait for app to be ready
         run: |
@@ -50,7 +50,7 @@ jobs:
           docker run -u root --network host \
             -v $(pwd):/zap/wrk/:rw \
             ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
-            -t http://localhost:8080 \
+            -t http://localhost:3000 \
             -g zap-gen.conf \
             -r zap-report.html \
             -J zap-report.json \
