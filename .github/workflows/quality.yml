@@ -40,10 +40,12 @@ jobs:
       - name: Start App
         run: |
           PORT=3000 cd utils/website && yarn start &
+        continue-on-error: true
 
       - name: Wait for app to be ready
         run: |
           sleep 15
+        continue-on-error: true
 
       - name: Run OWASP ZAP Baseline Scan
         run: |
@@ -64,10 +66,12 @@ jobs:
             -H 'X-Tool-Name: ZAP' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @zap-report.json
+        continue-on-error: true
 
       - name: Check for outdated npm packages
         run: |
           npm outdated --json > outdated.json || true
+        continue-on-error: true
 
       - name: Send Outdated Packages to API
         run: |
@@ -76,10 +80,12 @@ jobs:
             -H 'X-Tool-Name: Outdated-Packages' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @outdated.json
+        continue-on-error: true
 
       - name: Install Depcheck
         run: |
           npm install -g depcheck
+        continue-on-error: true
 
       - name: Run Depcheck
         run: |
@@ -93,6 +99,7 @@ jobs:
             -H 'X-Tool-Name: Depcheck' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @depcheck-results.json
+        continue-on-error: true
 
       - name: Install GitLeaks
         run: |
@@ -117,6 +124,7 @@ jobs:
             -H 'X-Tool-Name: GitLeaks' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @gitleaks.json
+        continue-on-error: true
 
       - name: Run Jest Tests
         run: |
@@ -130,10 +138,12 @@ jobs:
             -H 'X-Tool-Name: Jest' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @jest-results.json
+        continue-on-error: true
 
       - name: Install SonarScanner
         run: |
           npm install -g sonarqube-scanner
+        continue-on-error: true
 
       - name: Run SonarQube Analysis
         run: |
@@ -153,6 +163,7 @@ jobs:
             if [ "$STATUS" = "SUCCESS" ] || [ "$STATUS" = "FAILED" ]; then break; fi; \
             sleep 5; \
           done
+        continue-on-error: true
 
       - name: Fetch SonarQube Metrics
         run: |
@@ -168,10 +179,12 @@ jobs:
             -H 'X-Tool-Name: SonarQube' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @sonar-results.json
+        continue-on-error: true
 
       - name: Install Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+        continue-on-error: true
 
       - name: Run Trivy scan with SBOM, CVEs, and licenses
         run: |
@@ -185,6 +198,7 @@ jobs:
             -H 'X-Tool-Name: Trivy' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @trivy-results.json
+        continue-on-error: true
 
       - name: Fetch JIRA Sprint Story Points
         run: |
@@ -244,6 +258,7 @@ jobs:
             -H 'X-Tool-Name: Jira-SprintPoints' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @sprint_points.json
+        continue-on-error: true
 
       - name: Fetch Epics from JIRA
         run: |
@@ -263,6 +278,7 @@ jobs:
             -H 'X-Tool-Name: Jira-Security-Epics' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @epics.json
+        continue-on-error: true
 
       - name: Fetch Security Incidents Created During Sprint
         run: |
@@ -301,6 +317,7 @@ jobs:
             -H 'X-Tool-Name: Jira-Security-Incidents' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @security_incidents.json
+        continue-on-error: true
 
       - name: Fetch JIRA Bugs
         run: |
@@ -310,6 +327,7 @@ jobs:
             "https://mennokonijn.atlassian.net/rest/api/2/search?fields=key,summary,created")
           
           echo "$bugs" > jira_bugs.json
+        continue-on-error: true
 
       - name: Count LOC for Defect Density
         run: |
@@ -323,6 +341,7 @@ jobs:
       - name: Merge Defect Density Inputs
         run: |
           jq -s '.[0] * .[1]' jira_bugs.json loc.json > defect_density.json
+        continue-on-error: true
 
       - name: Send Defect Density Data to API
         run: |
@@ -331,6 +350,7 @@ jobs:
             -H 'X-Tool-Name: Jira-Defect-Density' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @defect_density.json
+        continue-on-error: true
 
       - name: Fetch Programming Language Breakdown
         run: |
@@ -347,6 +367,7 @@ jobs:
             -H 'X-Tool-Name: Language-Impact' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @languages.json
+        continue-on-error: true
 
       - name: Calculate Deployment Frequency
         run: |
@@ -364,6 +385,7 @@ jobs:
             -H 'X-Tool-Name: Deployment-Frequency' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @deployment_frequency.json
+        continue-on-error: true
 
       - name: Calculate Deployment Time
         run: |
@@ -393,6 +415,7 @@ jobs:
             -H 'X-Tool-Name: Deployment-Time' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @deployment_time.json
+        continue-on-error: true
 
       - name: Calculate MTTR
         run: |
@@ -423,3 +446,4 @@ jobs:
             -H 'X-Tool-Name: MTTR' \
             -H 'X-Repo-Name: https://github.com/mennokonijn/crystal' \
             --data @mttr.json
+        continue-on-error: true
